@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../api"; // 👈 Render backend api import kiya
 
 function Register() {
   const [name, setName] = useState("");
@@ -7,32 +8,29 @@ function Register() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
     if (!name || !email || !password) {
-      alert("All fields are required.");
+      alert("⚠️ All fields are required.");
       return;
     }
 
     if (password.length < 6) {
-      alert("Password must be at least 6 characters.");
+      alert("⚠️️ Password must be at least 6 characters.");
       return;
     }
 
-    const user = { name, email, password };
+    try {
+      // ✅ Call Render backend register route via api.js
+      await api.post("/users/register", { name, email, password });
 
-    // ✅ Save to localStorage
-    localStorage.setItem("user", JSON.stringify(user));
-
-    // ✅ Set a temporary fake userId for cart (can be replaced with real _id later)
-    if (!localStorage.getItem("userId")) {
-      const tempUserId = "user_" + Date.now(); // or use uuid
-      localStorage.setItem("userId", tempUserId);
+      alert("✅ Registration successful! Redirecting to login...");
+      navigate("/login");
+    } catch (err) {
+      console.error("❌ Registration error:", err);
+      alert(err.response?.data?.message || "❌ Registration failed. Try again.");
     }
-
-    alert("Registration successful! Redirecting to login...");
-    navigate("/login");
   };
 
   return (

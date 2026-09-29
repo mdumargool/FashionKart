@@ -1,29 +1,29 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../assets/style.css"; // ✅ Ensure this path is correct
+import api from "../api"; // 👈 Render backend api import kiya
+import "../assets/style.css";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const loginUser = (e) => {
+  const loginUser = async (e) => {
     e.preventDefault();
-    const storedUser = JSON.parse(localStorage.getItem("user"));
 
-    if (storedUser && email === storedUser.email && password === storedUser.password) {
+    try {
+      // ✅ Call Render backend login route via api.js
+      const res = await api.post("/users/login", { email, password });
+
       localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userId", res.data._id); // Real MongoDB user ID store kar liya
+      localStorage.setItem("user", JSON.stringify(res.data));
 
-      // ✅ Ensure userId exists for cart system
-      if (!localStorage.getItem("userId")) {
-        const tempUserId = "user_" + Date.now();
-        localStorage.setItem("userId", tempUserId);
-      }
-
-      alert("Login successful!");
+      alert("✅ Login successful!");
       navigate("/");
-    } else {
-      alert("Invalid email or password.");
+    } catch (err) {
+      console.error("❌ Login error:", err);
+      alert(err.response?.data?.message || "❌ Invalid email or password.");
     }
   };
 

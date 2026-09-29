@@ -3,6 +3,7 @@ import axios from "axios";
 import "../assets/style.css";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
+import { fetchProducts as getProducts } from "../api";
 
 function Home() {
   const [products, setProducts] = useState([]);
@@ -22,7 +23,7 @@ function Home() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/products");
+        const response = await getProducts();
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);

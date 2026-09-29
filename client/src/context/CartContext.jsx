@@ -1,6 +1,6 @@
 // src/context/CartContext.js
 import { createContext, useContext, useState, useEffect, useRef } from "react";
-import axios from "axios";
+import api from "../api"; // 👈 api.js import kar liya jo Render URL use karta hai
 
 const CartContext = createContext();
 
@@ -22,13 +22,13 @@ export const CartProvider = ({ children }) => {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  // ✅ Fetch cart from backend when userId changes
+  // ✅ Fetch cart from backend when userId changes using api.js
   useEffect(() => {
     if (!userId) return;
 
     const fetchCart = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/cart/${userId}`);
+        const res = await api.get(`/cart/${userId}`);
         setCartItems(res.data?.items || []);
         console.log("🛒 Cart fetched from backend:", res.data?.items);
       } catch (error) {
@@ -39,7 +39,7 @@ export const CartProvider = ({ children }) => {
     fetchCart();
   }, [userId]);
 
-  // ✅ Sync cart to backend when cartItems change
+  // ✅ Sync cart to backend when cartItems change using api.js
   useEffect(() => {
     if (!userId) return;
     if (isInitialLoad.current) {
@@ -49,12 +49,12 @@ export const CartProvider = ({ children }) => {
 
     const syncCart = async () => {
       try {
-        await axios.post(`http://localhost:5000/api/cart/${userId}`, {
+        await api.post(`/cart/${userId}`, {
           items: cartItems,
         });
-        console.log(" Cart synced to backend");
+        console.log("🛒 Cart synced to backend");
       } catch (error) {
-        console.error(" Failed to save cart:", error.message);
+        console.error("❌ Failed to save cart:", error.message);
       }
     };
 
@@ -67,7 +67,7 @@ export const CartProvider = ({ children }) => {
     const storedUserId = localStorage.getItem("userId");
 
     if (!user || !storedUserId) {
-      alert(" Please login to add items to cart.");
+      alert("⚠️ Please login to add items to cart.");
       return;
     }
 
@@ -93,7 +93,7 @@ export const CartProvider = ({ children }) => {
       ];
     });
 
-    alert(" Product added to cart!");
+    alert("✅ Product added to cart!");
   };
 
   const removeFromCart = (productId) => {

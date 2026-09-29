@@ -1,7 +1,7 @@
 // src/pages/Admin.jsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import "../assets/style.css";
+import api from "../api"; // 👈 api.js import kar liya jo Render URL use karta hai
 
 function Admin() {
   const [products, setProducts] = useState([]);
@@ -16,12 +16,12 @@ function Admin() {
 
   const isAdmin = localStorage.getItem("isAdmin") === "true";
 
-  // Fetch products
+  // Fetch products using api.js
   useEffect(() => {
     if (isAdmin) {
-      axios.get("http://localhost:5000/api/products")
+      api.get("/products")
         .then((res) => setProducts(res.data))
-        .catch((err) => console.error(err));
+        .catch((err) => console.error("Error fetching admin products:", err));
     }
   }, [isAdmin]);
 
@@ -30,16 +30,16 @@ function Admin() {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  // Add or Update product
+  // Add or Update product using api.js
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (editId) {
-        const res = await axios.put(`http://localhost:5000/api/products/${editId}`, formData);
+        const res = await api.put(`/products/${editId}`, formData);
         setProducts(products.map(p => p._id === editId ? res.data : p));
         setEditId(null);
       } else {
-        const res = await axios.post("http://localhost:5000/api/products", formData);
+        const res = await api.post("/products", formData);
         setProducts([...products, res.data]);
       }
       setFormData({ name: "", image: "", description: "", price: "", countInStock: "" });
@@ -48,10 +48,10 @@ function Admin() {
     }
   };
 
-  // Delete product
+  // Delete product using api.js
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/products/${id}`);
+      await api.delete(`/products/${id}`);
       setProducts(products.filter((p) => p._id !== id));
     } catch (err) {
       console.error("Delete failed", err);

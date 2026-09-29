@@ -1,14 +1,18 @@
+// src/pages/OrderHistory.jsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api"; // 👈 api.js import kar liya jo Render URL use karta hai
+import "../assets/style.css";
 
 function OrderHistory() {
   const [orders, setOrders] = useState([]);
-  const userId = "guest"; // later replace with logged-in user's ID
+  const userId = localStorage.getItem("userId"); // 👈 Dynamic userId from localStorage
 
   useEffect(() => {
+    if (!userId) return;
+
     const fetchOrders = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/orders/user/${userId}`);
+        const res = await api.get(`/orders/user/${userId}`); // 👈 Using api.js instance
         setOrders(res.data);
       } catch (err) {
         console.error("Error fetching orders", err);
@@ -16,12 +20,14 @@ function OrderHistory() {
     };
 
     fetchOrders();
-  }, []);
+  }, [userId]);
 
   return (
     <div className="cart-page">
       <h2>Your Orders</h2>
-      {orders.length === 0 ? (
+      {!userId ? (
+        <p>Please log in to view your order history.</p>
+      ) : orders.length === 0 ? (
         <p>No orders found.</p>
       ) : (
         orders.map((order) => (

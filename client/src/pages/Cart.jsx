@@ -1,6 +1,6 @@
 // src/pages/Cart.jsx
 import { useCart } from "../context/CartContext";
-import axios from "axios";
+import api from "../api"; // 👈 api.js import kar liya jo Render URL use karta hai
 import { useEffect, useState } from "react";
 import "../assets/style.css";
 
@@ -47,7 +47,8 @@ function Cart() {
 
       const totalPrice = getSubtotal();
 
-      const res = await axios.post("http://localhost:5000/api/orders", {
+      // ✅ Using api.js instead of localhost axios
+      const res = await api.post("/orders", {
         userId,
         orderItems,
         totalPrice,

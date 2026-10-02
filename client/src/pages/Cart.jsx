@@ -47,7 +47,7 @@ function Cart() {
 
       const totalPrice = getSubtotal();
 
-      // ✅ Using api.js instead of localhost axios
+      // ✅ Using api.js  axios
       const res = await api.post("/orders", {
         userId,
         orderItems,
